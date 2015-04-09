@@ -126,7 +126,7 @@ public class VeryLargeNumberSort {
 	@Ignore
 	public void SortOneBillionNumbers() {
 		// 1 Billion...THIS IS SLOW, 45 minutes on an i7 core!
-		System.out.printf("Result = %d\n", getNumber("oneThousand.bin", 1_000_000_000, 1_000_000));
+		System.out.printf("Result = %d\n", getNumber("oneBillion.bin", 1_000_000_000, 1_000_000));
 	}
 	
 	@Before
