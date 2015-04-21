@@ -27,7 +27,7 @@ public class VeryLargeNumberSort {
 	public int getNumber(String afileName, int maxNum, int rank) {
 		fileName = afileName;
 
-		System.out.printf("File = %s; Number Count=%d, Rank=%d\n", fileName, maxNum, rank);
+		System.out.printf("File = %s; Number Count=%d, Rank=%d%n", fileName, maxNum, rank);
 		Path path = Paths.get(fileName);
 		
 		// Only create the file if it does not exist...
