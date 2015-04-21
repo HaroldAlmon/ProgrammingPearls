@@ -24,25 +24,34 @@ import org.junit.Test;
 public class VeryLargeNumberSort {
 	private static String fileName = "numbers.bin";
 
-	public int getNumber(String afileName, int maxNum, int rank) {
+	public int sortFileandReturnRank(String afileName, int maxNum, int rank) {
+		int result = 0;
 		fileName = afileName;
 
 		System.out.printf("File = %s; Number Count=%d, Rank=%d%n", fileName, maxNum, rank);
 		Path path = Paths.get(fileName);
 		
-		// Only create the file if it does not exist...
-		if (Files.isRegularFile(path) == false) {
+		if ( ifFileDoesNotExist(path) ) {
 			createFile(maxNum);
 		}
 
-		int result = 0;
 		result = readInputFile(maxNum, rank);
 		return result;
 	}
+
+	private boolean ifFileDoesNotExist(Path path) {
+		return Files.isRegularFile(path) == false;
+	}
 	
 	private void createFile(int maxNum) {
-		OutputStream outputStream = null;
 		DataOutputStream dataOutputStream = null;
+		
+		dataOutputStream = createDataOutputStream(dataOutputStream);
+		createFileWithrandomNumbers(maxNum, dataOutputStream);
+	}
+
+	private DataOutputStream createDataOutputStream(DataOutputStream dataOutputStream) {
+		OutputStream outputStream;
 		try {
 			outputStream = new BufferedOutputStream( new FileOutputStream(fileName));
 			dataOutputStream = new DataOutputStream(outputStream);
@@ -50,7 +59,10 @@ public class VeryLargeNumberSort {
 		} catch (FileNotFoundException e1) {
 			e1.printStackTrace();
 		}
+		return dataOutputStream;
+	}
 
+	private void createFileWithrandomNumbers(int maxNum, DataOutputStream dataOutputStream) {
 		for(int i = 0; i < maxNum; i++) {
 			int number = (int) (maxNum * Math.random() + 1);
 			try {
@@ -58,7 +70,6 @@ public class VeryLargeNumberSort {
 			} catch (IOException e) {
 				e.printStackTrace();
 			};
-			//System.out.println("num = " + number);
 		} 
 		try {
 			dataOutputStream.flush();
@@ -66,13 +77,12 @@ public class VeryLargeNumberSort {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-
 	}
 	
 	private int readInputFile(int maxNum, int rank) {
 		BufferedInputStream bufferedInputStream = null;
 		DataInputStream dataInputStream = null;
-		int number = 0;
+		int randomNumber = 0;
 		PriorityQueue<Integer> pq = new PriorityQueue<>(10000);
 
 		try {
@@ -84,10 +94,11 @@ public class VeryLargeNumberSort {
 		
 		try {
 			if(dataInputStream.available() > 0) {
-				number = dataInputStream.readInt();
-				pq.add(number);
+				randomNumber = dataInputStream.readInt();
+				pq.add(randomNumber);
 				
 				// Batch is only used for tracking the progrss.
+				@SuppressWarnings("unused")
 				int batch=0;
 				
 				// The for-loop is nested in the while-loop just to allow the 
@@ -95,13 +106,13 @@ public class VeryLargeNumberSort {
 				while(dataInputStream.available() > 0) {
 					for (int i=0; i < 1024*1024; i++) {
 						if(dataInputStream.available() > 0) {
-							number = dataInputStream.readInt();
+							randomNumber = dataInputStream.readInt();
 							if(pq.size() < rank) {
-								pq.add(number);
+								pq.add(randomNumber);
 							} else
-							if ( number > pq.peek() ){
+							if ( randomNumber > pq.peek() ){
 								pq.remove();
-								pq.add(number);
+								pq.add(randomNumber);
 							}
 						}
 					}
@@ -116,17 +127,17 @@ public class VeryLargeNumberSort {
 		return pq.peek();
 	}
 
-	@Test(timeout=20000)
+	@Test(timeout=20_000)
 	public void SortOneThousandNumbers() {
-		System.out.printf("Result = %d\n", getNumber("oneThousand.bin", 1_000, 100));
+		System.out.printf("Result = %d%n", sortFileandReturnRank("oneThousand.bin", 1_000, 100));
 	}
 	
 	// Set a two hour limit...
-	@Test(timeout=7200000)
+	@Test(timeout=7_200_000)
 	@Ignore
 	public void SortOneBillionNumbers() {
 		// 1 Billion...THIS IS SLOW, 45 minutes on an i7 core!
-		System.out.printf("Result = %d\n", getNumber("oneBillion.bin", 1_000_000_000, 1_000_000));
+		System.out.printf("Result = %d%n", sortFileandReturnRank("oneBillion.bin", 1_000_000_000, 1_000_000));
 	}
 	
 	@Before
