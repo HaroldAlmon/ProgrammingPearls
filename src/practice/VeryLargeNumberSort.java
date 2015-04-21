@@ -83,7 +83,7 @@ public class VeryLargeNumberSort {
 		BufferedInputStream bufferedInputStream = null;
 		DataInputStream dataInputStream = null;
 		int randomNumber = 0;
-		PriorityQueue<Integer> pq = new PriorityQueue<>(10000);
+		PriorityQueue<Integer> priorityQueue = new PriorityQueue<>(10000);
 
 		try {
 			bufferedInputStream = new BufferedInputStream(new FileInputStream(fileName)) ;
@@ -91,49 +91,67 @@ public class VeryLargeNumberSort {
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
-		
 		try {
 			if(dataInputStream.available() > 0) {
 				randomNumber = dataInputStream.readInt();
-				pq.add(randomNumber);
+				priorityQueue.add(randomNumber);
 				
-				// Batch is only used for tracking the progrss.
-				@SuppressWarnings("unused")
-				int batch=0;
+				int batchCounter=1;
 				
-				// The for-loop is nested in the while-loop just to allow the 
-				// System.out.printf without the need of doing a slow modulo operation.
 				while(dataInputStream.available() > 0) {
-					for (int i=0; i < 1024*1024; i++) {
-						if(dataInputStream.available() > 0) {
-							randomNumber = dataInputStream.readInt();
-							if(pq.size() < rank) {
-								pq.add(randomNumber);
-							} else
-							if ( randomNumber > pq.peek() ){
-								pq.remove();
-								pq.add(randomNumber);
-							}
-						}
-					}
-					//System.out.printf("Batch=%d, pq.peek()=%d\n", batch, pq.peek().intValue() );
-					batch++;
+					sortUpToOneMillionInts(rank, dataInputStream, priorityQueue);
+					printBatchCouter(batchCounter);
+					batchCounter++;
 				}
 			}
 			dataInputStream.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		return pq.peek();
+		return priorityQueue.peek();
 	}
 
-	@Test(timeout=20_000)
+	@SuppressWarnings("unused")
+	private void printBatchCouter(int batchCounter) {
+		if(false) 			
+			System.out.printf("Batch Count = %s%n", batchCounter);
+	}
+
+	private void sortUpToOneMillionInts(int rank, DataInputStream dataInputStream, PriorityQueue<Integer> priorityQueue) throws IOException {
+		int randomNumber;
+		final int oneMillion = 1024 * 1024;
+		for (int i=0; i < oneMillion; i++) {
+			if(dataInputStream.available() > 0) {
+				randomNumber = dataInputStream.readInt();
+				if( queueIsNotFull(rank, priorityQueue) ) {
+					priorityQueue.add(randomNumber);
+				} else
+				if ( ifNumberIsGreaterThanAllNumbersInQueue(priorityQueue, randomNumber) ) {
+					priorityQueue.remove();
+					priorityQueue.add(randomNumber);
+				}
+			}
+			else
+				break;
+		}
+	}
+
+	private boolean ifNumberIsGreaterThanAllNumbersInQueue(
+			PriorityQueue<Integer> priorityQueue, int randomNumber) {
+		return randomNumber > priorityQueue.peek();
+	}
+
+	private boolean queueIsNotFull(int rank, PriorityQueue<Integer> priorityQueue) {
+		return priorityQueue.size() < rank;
+	}
+
+	@Test(timeout=500)
 	public void SortOneThousandNumbers() {
 		System.out.printf("Result = %d%n", sortFileandReturnRank("oneThousand.bin", 1_000, 100));
 	}
 	
-	// Set a two hour limit...
-	@Test(timeout=7_200_000)
+	private final int twoHours = 2 * 3_600;
+	@Test(timeout = twoHours)
 	@Ignore
 	public void SortOneBillionNumbers() {
 		// 1 Billion...THIS IS SLOW, 45 minutes on an i7 core!
