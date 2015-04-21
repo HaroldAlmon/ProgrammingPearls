@@ -95,10 +95,9 @@ public class VeryLargeNumberSort {
 			if(dataInputStream.available() > 0) {
 				randomNumber = dataInputStream.readInt();
 				priorityQueue.add(randomNumber);
-				
-				int batchCounter=1;
-				
 				while(dataInputStream.available() > 0) {
+					int batchCounter=1;
+					
 					sortUpToOneMillionInts(rank, dataInputStream, priorityQueue);
 					printBatchCouter(batchCounter);
 					batchCounter++;
