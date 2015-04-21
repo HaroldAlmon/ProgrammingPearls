@@ -24,7 +24,7 @@ import org.junit.Test;
 public class VeryLargeNumberSort {
 	private static String fileName = "numbers.bin";
 
-	public int sortFileandReturnRank(String afileName, int maxNum, int rank) {
+	public int sortFileandReturnNumber(String afileName, int maxNum, int rank) {
 		int result = 0;
 		fileName = afileName;
 
@@ -82,7 +82,6 @@ public class VeryLargeNumberSort {
 	private int readInputFile(int maxNum, int rank) {
 		BufferedInputStream bufferedInputStream = null;
 		DataInputStream dataInputStream = null;
-		int randomNumber = 0;
 		PriorityQueue<Integer> priorityQueue = new PriorityQueue<>(10000);
 
 		try {
@@ -140,7 +139,7 @@ public class VeryLargeNumberSort {
 		}
 	}
 
-	private boolean ifNumberIsGreaterThanSmallestNumberInQueue(PriorityQueue<Integer> priorityQueue, int randomNumber) {
+	private boolean ifRandomNumberIsGreaterThanSmallestNumberInQueue(PriorityQueue<Integer> priorityQueue, int randomNumber) {
 		return randomNumber > priorityQueue.peek();
 	}
 
@@ -150,7 +149,7 @@ public class VeryLargeNumberSort {
 
 	@Test(timeout=500)
 	public void SortOneThousandNumbers() {
-		System.out.printf("Result = %d%n", sortFileandReturnRank("oneThousand.bin", 1_000, 100));
+		System.out.printf("Result = %d%n", sortFileandReturnNumber("oneThousand.bin", 1_000, 100));
 	}
 	
 	private final int twoHours = 2 * 3_600;
@@ -158,7 +157,7 @@ public class VeryLargeNumberSort {
 	@Ignore
 	public void SortOneBillionNumbers() {
 		// 1 Billion...THIS IS SLOW, 45 minutes on an i7 core!
-		System.out.printf("Result = %d%n", sortFileandReturnRank("oneBillion.bin", 1_000_000_000, 1_000_000));
+		System.out.printf("Result = %d%n", sortFileandReturnNumber("oneBillion.bin", 1_000_000_000, 1_000_000));
 	}
 	
 	@Before
