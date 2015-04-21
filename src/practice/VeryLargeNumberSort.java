@@ -92,22 +92,27 @@ public class VeryLargeNumberSort {
 			e.printStackTrace();
 		}
 		try {
-			if(dataInputStream.available() > 0) {
-				randomNumber = dataInputStream.readInt();
-				priorityQueue.add(randomNumber);
-				while(dataInputStream.available() > 0) {
-					int batchCounter=1;
-					
-					sortUpToOneMillionInts(rank, dataInputStream, priorityQueue);
-					printBatchCouter(batchCounter);
-					batchCounter++;
-				}
-			}
+			sortFile(rank, dataInputStream, priorityQueue);
 			dataInputStream.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		return priorityQueue.peek();
+	}
+
+	private void sortFile(int rank, DataInputStream dataInputStream, PriorityQueue<Integer> priorityQueue) throws IOException {
+		int randomNumber;
+		if(dataInputStream.available() > 0) {
+			randomNumber = dataInputStream.readInt();
+			priorityQueue.add(randomNumber);
+			while(dataInputStream.available() > 0) {
+				int batchCounter=1;
+				
+				sortUpToOneMillionInts(rank, dataInputStream, priorityQueue);
+				printBatchCouter(batchCounter);
+				batchCounter++;
+			}
+		}
 	}
 
 	@SuppressWarnings("unused")
@@ -125,7 +130,7 @@ public class VeryLargeNumberSort {
 				if( queueIsNotFull(rank, priorityQueue) ) {
 					priorityQueue.add(randomNumber);
 				} else
-				if ( ifNumberIsGreaterThanAllNumbersInQueue(priorityQueue, randomNumber) ) {
+				if ( ifRandomNumberIsGreaterThanSmallestNumberInQueue(priorityQueue, randomNumber) ) {
 					priorityQueue.remove();
 					priorityQueue.add(randomNumber);
 				}
@@ -135,8 +140,7 @@ public class VeryLargeNumberSort {
 		}
 	}
 
-	private boolean ifNumberIsGreaterThanAllNumbersInQueue(
-			PriorityQueue<Integer> priorityQueue, int randomNumber) {
+	private boolean ifNumberIsGreaterThanSmallestNumberInQueue(PriorityQueue<Integer> priorityQueue, int randomNumber) {
 		return randomNumber > priorityQueue.peek();
 	}
 
