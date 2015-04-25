@@ -1,8 +1,5 @@
 package practice;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.DataInputStream;
@@ -30,7 +27,8 @@ public enum VeryLargeNumberSort {
 	}
 	
 	@SuppressWarnings("unused")
-	public int sortFileandReturnNumber(String afileName, int maxNum, int rank) {
+	// This is deliberately single threaded so cannot sort 2 files at once.
+	public synchronized int sortFileandReturnNumber(String afileName, int maxNum, int rank) {
 		int result = 0;
 		fileName = afileName;
 		
@@ -52,7 +50,7 @@ public enum VeryLargeNumberSort {
 	
 	private void createFile(int maxNum) {
 		DataOutputStream dataOutputStream = null;
-		
+
 		dataOutputStream = createDataOutputStream(dataOutputStream);
 		createFileWithrandomNumbers(maxNum, dataOutputStream);
 	}
@@ -62,7 +60,7 @@ public enum VeryLargeNumberSort {
 		try {
 			outputStream = new BufferedOutputStream( new FileOutputStream(fileName));
 			dataOutputStream = new DataOutputStream(outputStream);
-			
+
 		} catch (FileNotFoundException e1) {
 			e1.printStackTrace();
 		}
@@ -107,17 +105,12 @@ public enum VeryLargeNumberSort {
 	}
 
 	private void sortFile(int rank, DataInputStream dataInputStream, PriorityQueue<Integer> priorityQueue) throws IOException {
-		int randomNumber;
-		if(dataInputStream.available() > 0) {
-			randomNumber = dataInputStream.readInt();
-			priorityQueue.add(randomNumber);
-			while(dataInputStream.available() > 0) {
-				int batchCounter=1;
-				
-				sortUpToOneMillionInts(rank, dataInputStream, priorityQueue);
-				printBatchCouter(batchCounter);
-				batchCounter++;
-			}
+		while (dataInputStream.available() > 0) {
+			int batchCounter = 1;
+
+			sortBatch(rank, dataInputStream, priorityQueue);
+			printBatchCouter(batchCounter);
+			batchCounter++;
 		}
 	}
 
@@ -127,15 +120,16 @@ public enum VeryLargeNumberSort {
 			System.out.printf("Batch Count = %s%n", batchCounter);
 	}
 
-	private void sortUpToOneMillionInts(int rank, DataInputStream dataInputStream, PriorityQueue<Integer> priorityQueue) throws IOException {
+	private void sortBatch(int rank, DataInputStream dataInputStream, PriorityQueue<Integer> priorityQueue) throws IOException {
 		int numberRead;
-		final int oneMillion = 1024 * 1024;
-		for (int i=0; i < oneMillion; i++) {
+		final int batchSize = 1024 * 1024;
+		for (int i=0; i < batchSize; i++) {
 			if(dataInputStream.available() > 0) {
 				numberRead = dataInputStream.readInt();
 				if( queueIsNotFull(rank, priorityQueue) ) {
 					priorityQueue.add(numberRead);
 				} else
+				// This is the most important line in the entire file...
 				if ( ifNumberReadIsGreaterThanSmallestNumberInQueue(priorityQueue, numberRead) ) {
 					priorityQueue.remove();
 					priorityQueue.add(numberRead);

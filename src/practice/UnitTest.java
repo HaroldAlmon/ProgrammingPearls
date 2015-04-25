@@ -8,7 +8,6 @@ public class UnitTest {
 	
 	@Test(timeout = 500)
 	public void VeryLargeNumberSort() {
-//		VeryLargeNumberSort veryLargeNumberSort = VeryLargeNumberSort.getInstance();
 		System.out.printf("sortFileandReturnNumber(\"oneThousand.bin\", 1_000, 100) = %d%n", veryLargeNumberSort.sortFileandReturnNumber("oneThousand.bin", 1_000, 100));
 	}
 	
