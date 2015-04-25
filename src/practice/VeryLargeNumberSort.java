@@ -21,14 +21,21 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
-public class VeryLargeNumberSort {
-	private static String fileName = "numbers.bin";
+public enum VeryLargeNumberSort {
+	INSTANCE;
 
+	private static String fileName = "numbers.bin";
+	public static VeryLargeNumberSort getInstance() {
+		return INSTANCE;
+	}
+	
+	@SuppressWarnings("unused")
 	public int sortFileandReturnNumber(String afileName, int maxNum, int rank) {
 		int result = 0;
 		fileName = afileName;
-
-		System.out.printf("File = %s; Number Count=%d, Rank=%d%n", fileName, maxNum, rank);
+		
+		if(false)
+			System.out.printf("File = %s; Number Count=%d, Rank=%d%n", fileName, maxNum, rank);
 		Path path = Paths.get(fileName);
 		
 		if ( ifFileDoesNotExist(path) ) {
@@ -121,17 +128,17 @@ public class VeryLargeNumberSort {
 	}
 
 	private void sortUpToOneMillionInts(int rank, DataInputStream dataInputStream, PriorityQueue<Integer> priorityQueue) throws IOException {
-		int randomNumber;
+		int numberRead;
 		final int oneMillion = 1024 * 1024;
 		for (int i=0; i < oneMillion; i++) {
 			if(dataInputStream.available() > 0) {
-				randomNumber = dataInputStream.readInt();
+				numberRead = dataInputStream.readInt();
 				if( queueIsNotFull(rank, priorityQueue) ) {
-					priorityQueue.add(randomNumber);
+					priorityQueue.add(numberRead);
 				} else
-				if ( ifRandomNumberIsGreaterThanSmallestNumberInQueue(priorityQueue, randomNumber) ) {
+				if ( ifNumberReadIsGreaterThanSmallestNumberInQueue(priorityQueue, numberRead) ) {
 					priorityQueue.remove();
-					priorityQueue.add(randomNumber);
+					priorityQueue.add(numberRead);
 				}
 			}
 			else
@@ -139,7 +146,7 @@ public class VeryLargeNumberSort {
 		}
 	}
 
-	private boolean ifRandomNumberIsGreaterThanSmallestNumberInQueue(PriorityQueue<Integer> priorityQueue, int randomNumber) {
+	private boolean ifNumberReadIsGreaterThanSmallestNumberInQueue(PriorityQueue<Integer> priorityQueue, int randomNumber) {
 		return randomNumber > priorityQueue.peek();
 	}
 
@@ -149,6 +156,7 @@ public class VeryLargeNumberSort {
 
 	@Test(timeout=500)
 	public void SortOneThousandNumbers() {
+		//VeryLargeNumberSort veryLargeNumberSort = LargeNumberFactory.getInstance();
 		System.out.printf("Result = %d%n", sortFileandReturnNumber("oneThousand.bin", 1_000, 100));
 	}
 	
