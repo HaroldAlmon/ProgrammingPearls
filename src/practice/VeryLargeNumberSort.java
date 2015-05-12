@@ -17,7 +17,9 @@ import java.util.PriorityQueue;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-
+/**
+ * @author Harold Almon
+ */
 public enum VeryLargeNumberSort {
 	INSTANCE;
 
@@ -27,7 +29,7 @@ public enum VeryLargeNumberSort {
 	}
 	
 	@SuppressWarnings("unused")
-	// This is deliberately single threaded so cannot sort 2 files at once.
+	// This is deliberately single threaded so you cannot sort 2 files at once.
 	public synchronized int sortFileandReturnNumber(String afileName, int maxNum, int rank) {
 		int result = 0;
 		fileName = afileName;
@@ -52,7 +54,7 @@ public enum VeryLargeNumberSort {
 		DataOutputStream dataOutputStream = null;
 
 		dataOutputStream = createDataOutputStream(dataOutputStream);
-		createFileWithrandomNumbers(maxNum, dataOutputStream);
+		createFileWithRandomNumbers(maxNum, dataOutputStream);
 	}
 
 	private DataOutputStream createDataOutputStream(DataOutputStream dataOutputStream) {
@@ -63,17 +65,19 @@ public enum VeryLargeNumberSort {
 
 		} catch (FileNotFoundException e1) {
 			e1.printStackTrace();
+			System.exit(-1);
 		}
 		return dataOutputStream;
 	}
 
-	private void createFileWithrandomNumbers(int maxNum, DataOutputStream dataOutputStream) {
+	private void createFileWithRandomNumbers(int maxNum, DataOutputStream dataOutputStream) {
 		for(int i = 0; i < maxNum; i++) {
 			int number = (int) (maxNum * Math.random() + 1);
 			try {
 				dataOutputStream.writeInt(number);
 			} catch (IOException e) {
 				e.printStackTrace();
+				System.exit(-1);
 			};
 		} 
 		try {
@@ -81,6 +85,7 @@ public enum VeryLargeNumberSort {
 			dataOutputStream.close();
 		} catch (IOException e) {
 			e.printStackTrace();
+			System.exit(-1);
 		}
 	}
 	
@@ -94,12 +99,14 @@ public enum VeryLargeNumberSort {
 			dataInputStream = new DataInputStream(bufferedInputStream);
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
+			System.exit(0);
 		}
 		try {
 			sortFile(rank, dataInputStream, priorityQueue);
 			dataInputStream.close();
 		} catch (IOException e) {
 			e.printStackTrace();
+			System.exit(-1);
 		}
 		return priorityQueue.peek();
 	}
@@ -126,11 +133,11 @@ public enum VeryLargeNumberSort {
 		for (int i=0; i < batchSize; i++) {
 			if(dataInputStream.available() > 0) {
 				numberRead = dataInputStream.readInt();
-				if( queueIsNotFull(rank, priorityQueue) ) {
+				if( isQueueIsNotFull(rank, priorityQueue) ) {
 					priorityQueue.add(numberRead);
 				} else
 				// This is the most important line in the entire file...
-				if ( ifNumberReadIsGreaterThanSmallestNumberInQueue(priorityQueue, numberRead) ) {
+				if ( isNumberReadIsGreaterThanSmallestNumberInQueue(priorityQueue, numberRead) ) {
 					priorityQueue.remove();
 					priorityQueue.add(numberRead);
 				}
@@ -140,18 +147,18 @@ public enum VeryLargeNumberSort {
 		}
 	}
 
-	private boolean ifNumberReadIsGreaterThanSmallestNumberInQueue(PriorityQueue<Integer> priorityQueue, int randomNumber) {
+	private boolean isNumberReadIsGreaterThanSmallestNumberInQueue(PriorityQueue<Integer> priorityQueue, int randomNumber) {
 		return randomNumber > priorityQueue.peek();
 	}
 
-	private boolean queueIsNotFull(int rank, PriorityQueue<Integer> priorityQueue) {
+	private boolean isQueueIsNotFull(int rank, PriorityQueue<Integer> priorityQueue) {
 		return priorityQueue.size() < rank;
 	}
 
 	@Test(timeout=500)
 	public void SortOneThousandNumbers() {
 		//VeryLargeNumberSort veryLargeNumberSort = LargeNumberFactory.getInstance();
-		System.out.printf("Result = %d%n", sortFileandReturnNumber("oneThousand.bin", 1_000, 100));
+		System.out.printf("SortOneThousandNumbers(\"oneThousand.bin\", 1_000, 100) = %d%n", sortFileandReturnNumber("oneThousand.bin", 1_000, 100));
 	}
 	
 	private final int twoHours = 2 * 3_600;
@@ -159,7 +166,7 @@ public enum VeryLargeNumberSort {
 	@Ignore
 	public void SortOneBillionNumbers() {
 		// 1 Billion...THIS IS SLOW, 45 minutes on an i7 core!
-		System.out.printf("Result = %d%n", sortFileandReturnNumber("oneBillion.bin", 1_000_000_000, 1_000_000));
+		System.out.printf("SortOneBillionNumbers(\"oneBillion.bin\", 1_000_000_000, 1_000_000)) = %d%n", sortFileandReturnNumber("oneBillion.bin", 1_000_000_000, 1_000_000));
 	}
 	
 	@Before
