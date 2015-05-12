@@ -17,9 +17,7 @@ import java.util.PriorityQueue;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-/**
- * @author Harold Almon
- */
+/** Strategy: Priority Queue. */
 public enum VeryLargeNumberSort {
 	INSTANCE;
 
@@ -42,7 +40,7 @@ public enum VeryLargeNumberSort {
 			createFile(maxNum);
 		}
 
-		result = readInputFile(maxNum, rank);
+		result = rankedNumber(maxNum, rank);
 		return result;
 	}
 
@@ -89,10 +87,11 @@ public enum VeryLargeNumberSort {
 		}
 	}
 	
-	private int readInputFile(int maxNum, int rank) {
+	private int rankedNumber(int maxNum, int rank) {
 		BufferedInputStream bufferedInputStream = null;
 		DataInputStream dataInputStream = null;
-		PriorityQueue<Integer> priorityQueue = new PriorityQueue<>(10000);
+
+		int result = 0;
 
 		try {
 			bufferedInputStream = new BufferedInputStream(new FileInputStream(fileName)) ;
@@ -102,16 +101,17 @@ public enum VeryLargeNumberSort {
 			System.exit(0);
 		}
 		try {
-			sortFile(rank, dataInputStream, priorityQueue);
+			result = sortFileandGetNumber(rank, dataInputStream);
 			dataInputStream.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 			System.exit(-1);
 		}
-		return priorityQueue.peek();
+		return result;
 	}
 
-	private void sortFile(int rank, DataInputStream dataInputStream, PriorityQueue<Integer> priorityQueue) throws IOException {
+	private int sortFileandGetNumber(int rank, DataInputStream dataInputStream) throws IOException {
+		PriorityQueue<Integer> priorityQueue = new PriorityQueue<>(10000);
 		while (dataInputStream.available() > 0) {
 			int batchCounter = 1;
 
@@ -119,6 +119,7 @@ public enum VeryLargeNumberSort {
 			printBatchCouter(batchCounter);
 			batchCounter++;
 		}
+		return priorityQueue.peek();
 	}
 
 	@SuppressWarnings("unused")
