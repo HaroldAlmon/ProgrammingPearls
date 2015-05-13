@@ -1,14 +1,10 @@
 package practice;
 
 import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -18,6 +14,7 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 /** Strategy: Priority Queue. */
+// Because this is an enum, you cannot run a JUnit test from this file.
 public enum VeryLargeNumberSort {
 	INSTANCE;
 
@@ -26,71 +23,32 @@ public enum VeryLargeNumberSort {
 		return INSTANCE;
 	}
 	
-	@SuppressWarnings("unused")
 	// This is deliberately single threaded so you cannot sort 2 files at once.
 	public synchronized int sortFileandReturnNumber(String afileName, int maxNum, int rank) {
 		int result = 0;
+		boolean isDebug = false;
 		fileName = afileName;
 		
-		if(false)
+		if( isDebug )
 			System.out.printf("File = %s; Number Count=%d, Rank=%d%n", fileName, maxNum, rank);
 		Path path = Paths.get(fileName);
 		
 		if ( ifFileDoesNotExist(path) ) {
-			createFile(maxNum);
+			FileCreator fileCreator = new FileCreator();
+			fileCreator.createFile(maxNum, fileName);
 		}
 
-		result = rankedNumber(maxNum, rank);
+		result = rankedNumber(fileName, maxNum, rank);
 		return result;
 	}
 
 	private boolean ifFileDoesNotExist(Path path) {
 		return Files.isRegularFile(path) == false;
 	}
-	
-	private void createFile(int maxNum) {
-		DataOutputStream dataOutputStream = null;
 
-		dataOutputStream = createDataOutputStream(dataOutputStream);
-		createFileWithRandomNumbers(maxNum, dataOutputStream);
-	}
-
-	private DataOutputStream createDataOutputStream(DataOutputStream dataOutputStream) {
-		OutputStream outputStream;
-		try {
-			outputStream = new BufferedOutputStream( new FileOutputStream(fileName));
-			dataOutputStream = new DataOutputStream(outputStream);
-
-		} catch (FileNotFoundException e1) {
-			e1.printStackTrace();
-			System.exit(-1);
-		}
-		return dataOutputStream;
-	}
-
-	private void createFileWithRandomNumbers(int maxNum, DataOutputStream dataOutputStream) {
-		for(int i = 0; i < maxNum; i++) {
-			int number = (int) (maxNum * Math.random() + 1);
-			try {
-				dataOutputStream.writeInt(number);
-			} catch (IOException e) {
-				e.printStackTrace();
-				System.exit(-1);
-			};
-		} 
-		try {
-			dataOutputStream.flush();
-			dataOutputStream.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-			System.exit(-1);
-		}
-	}
-	
-	private int rankedNumber(int maxNum, int rank) {
+	private int rankedNumber(String fileName, int maxNum, int rank) {
 		BufferedInputStream bufferedInputStream = null;
 		DataInputStream dataInputStream = null;
-
 		int result = 0;
 
 		try {
@@ -137,10 +95,12 @@ public enum VeryLargeNumberSort {
 				if( isQueueIsNotFull(rank, priorityQueue) ) {
 					priorityQueue.add(numberRead);
 				} else
-				// This is the most important line in the entire file...
-				if ( isNumberReadIsGreaterThanSmallestNumberInQueue(priorityQueue, numberRead) ) {
-					priorityQueue.remove();
-					priorityQueue.add(numberRead);
+				{
+					// This is the most important line in the entire file...
+					if ( isNumberReadIsGreaterThanSmallestNumberInQueue(priorityQueue, numberRead) ) {
+						priorityQueue.remove();
+						priorityQueue.add(numberRead);
+					}
 				}
 			}
 			else
@@ -154,24 +114,5 @@ public enum VeryLargeNumberSort {
 
 	private boolean isQueueIsNotFull(int rank, PriorityQueue<Integer> priorityQueue) {
 		return priorityQueue.size() < rank;
-	}
-
-	@Test(timeout=500)
-	public void SortOneThousandNumbers() {
-		//VeryLargeNumberSort veryLargeNumberSort = LargeNumberFactory.getInstance();
-		System.out.printf("SortOneThousandNumbers(\"oneThousand.bin\", 1_000, 100) = %d%n", sortFileandReturnNumber("oneThousand.bin", 1_000, 100));
-	}
-	
-	private final int twoHours = 2 * 3_600;
-	@Test(timeout = twoHours)
-	@Ignore
-	public void SortOneBillionNumbers() {
-		// 1 Billion...THIS IS SLOW, 45 minutes on an i7 core!
-		System.out.printf("SortOneBillionNumbers(\"oneBillion.bin\", 1_000_000_000, 1_000_000)) = %d%n", sortFileandReturnNumber("oneBillion.bin", 1_000_000_000, 1_000_000));
-	}
-	
-	@Before
-	public void setup() {
-		System.out.println("-----------------");
 	}
 }
