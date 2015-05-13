@@ -13,9 +13,8 @@ public class UnitTest {
 	
 	private final int twoHours = 2 * 3_600;
 	@Test(timeout = twoHours)
-	@Ignore
+	@Ignore("THIS IS SLOW, 45 minutes on an i7 core machine!")
 	public void SortOneBillionNumbers() {
-		// 1 Billion...THIS IS SLOW, 45 minutes on an i7 core!
 		System.out.printf("sortFileandReturnNumber(\"oneBillion.bin\", 1_000_000_000, 1_000_000) = %d%n", veryLargeNumberSort.sortFileandReturnNumber("oneBillion.bin", 1_000_000_000, 1_000_000));
 	}
 }

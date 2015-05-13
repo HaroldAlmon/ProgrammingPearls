@@ -18,16 +18,15 @@ import org.junit.Test;
 public enum VeryLargeNumberSort {
 	INSTANCE;
 
-	private static String fileName = "numbers.bin";
+	//private static String fileName = "numbers.bin";
 	public static VeryLargeNumberSort getInstance() {
 		return INSTANCE;
 	}
 	
 	// This is deliberately single threaded so you cannot sort 2 files at once.
-	public synchronized int sortFileandReturnNumber(String afileName, int maxNum, int rank) {
+	public synchronized int sortFileandReturnNumber(String fileName, int maxNum, int rank) {
 		int result = 0;
 		boolean isDebug = false;
-		fileName = afileName;
 		
 		if( isDebug )
 			System.out.printf("File = %s; Number Count=%d, Rank=%d%n", fileName, maxNum, rank);

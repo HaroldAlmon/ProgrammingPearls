@@ -9,16 +9,16 @@ import java.io.OutputStream;
 
 public class FileCreator {
 	void createFile(int maxNum, String fileName) {
-
 		DataOutputStream dataOutputStream = null;
-
 		dataOutputStream = createDataOutputStream(dataOutputStream, fileName);
 		generateRandomNumbers(maxNum, dataOutputStream);
 	}
 	
 	private void generateRandomNumbers(int maxNum, DataOutputStream dataOutputStream) {
 		for(int i = 0; i < maxNum; i++) {
-			int number = (int) (maxNum * Math.random() + 1);
+			int number;
+
+			number = (int) (maxNum * Math.random() + 1);
 			try {
 				dataOutputStream.writeInt(number);
 			} catch (IOException e) {
