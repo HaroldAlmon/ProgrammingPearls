@@ -10,13 +10,11 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.PriorityQueue;
 
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
 /** Strategy: Priority Queue. */
 // Because this is an enum, you cannot run a JUnit test from this file.
 public enum VeryLargeNumberSort {
 	INSTANCE;
+	private final boolean isDebug = false;
 
 	//private static String fileName = "numbers.bin";
 	public static VeryLargeNumberSort getInstance() {
@@ -81,7 +79,7 @@ public enum VeryLargeNumberSort {
 
 	@SuppressWarnings("unused")
 	private void printBatchCouter(int batchCounter) {
-		if(false) 			
+		if(isDebug) 			
 			System.out.printf("Batch Count = %s%n", batchCounter);
 	}
 
@@ -91,8 +89,10 @@ public enum VeryLargeNumberSort {
 		for (int i=0; i < batchSize; i++) {
 			if(dataInputStream.available() > 0) {
 				numberRead = dataInputStream.readInt();
-				if( isQueueIsNotFull(rank, priorityQueue) ) {
+				if( isQueueFull(rank, priorityQueue) == false ) {
 					priorityQueue.add(numberRead);
+					if(isDebug )
+						System.out.printf("%d%n", numberRead);
 				} else
 				{
 					// This is the most important line in the entire file...
@@ -111,7 +111,7 @@ public enum VeryLargeNumberSort {
 		return randomNumber > priorityQueue.peek();
 	}
 
-	private boolean isQueueIsNotFull(int rank, PriorityQueue<Integer> priorityQueue) {
-		return priorityQueue.size() < rank;
+	private boolean isQueueFull(int rank, PriorityQueue<Integer> priorityQueue) {
+		return priorityQueue.size() >= rank;
 	}
 }
