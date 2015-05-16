@@ -14,7 +14,7 @@ import java.util.PriorityQueue;
 // NOTE: Because this is an enum, you cannot run a JUnit test from this file!
 public enum VeryLargeNumberSort {
 	INSTANCE;
-	private final boolean isDebug = false;
+	//private final boolean isDebug = false;
 
 	//private static String fileName = "numbers.bin";
 	public static VeryLargeNumberSort getInstance() {
@@ -24,10 +24,7 @@ public enum VeryLargeNumberSort {
 	// This is deliberately single threaded so you cannot sort 2 files at once.
 	public synchronized int sortFileandReturnNumber( String fileName, int maxNum, int rank ) {
 		int result = 0;
-		boolean isDebug = false;
 		
-		if( isDebug )
-			System.out.printf( "File = %s; Number Count=%d, Rank=%d%n", fileName, maxNum, rank );
 		Path path = Paths.get( fileName );
 		
 		if ( ifFileDoesNotExist( path ) ) {
@@ -65,45 +62,24 @@ public enum VeryLargeNumberSort {
 		return result;
 	}
 
-	private int sortFileandGetNumber( int rank, DataInputStream dataInputStream ) throws IOException {
-		PriorityQueue<Integer> priorityQueue = new PriorityQueue<>( 10000 );
-		while ( dataInputStream.available() > 0 ) {
-			int batchCounter = 1;
-
-			sortBatch( rank, dataInputStream, priorityQueue );
-			printBatchCouter( batchCounter );
-			batchCounter++;
-		}
-		return priorityQueue.peek();
-	}
-
-	private void printBatchCouter( int batchCounter ) {
-		if(isDebug) 			
-			System.out.printf("Batch Count = %s%n", batchCounter);
-	}
-
-	private void sortBatch( int rank, DataInputStream dataInputStream, PriorityQueue<Integer> priorityQueue ) throws IOException {
+	private int sortFileandGetNumber( int rank, DataInputStream dataInputStream  ) throws IOException {
 		int numberRead;
-		final int batchSize = 1024 * 1024;
-		for ( int i=0; i < batchSize; i++ ) {
-			if( dataInputStream.available() > 0 ) {
-				numberRead = dataInputStream.readInt();
-				if( isQueueFull(rank, priorityQueue) == false ) {
-					priorityQueue.add(numberRead);
-					if(isDebug )
-						System.out.printf("%d%n", numberRead);
-				} else
-				{
-					// This is the most important line in the entire file...
-					if ( isNumberGreaterThanSmallestNumberInQueue(priorityQueue, numberRead) ) {
-						priorityQueue.remove();
-						priorityQueue.add(numberRead);
-					}
+		PriorityQueue<Integer> priorityQueue = new PriorityQueue<>( 10_000 );
+		
+		while (dataInputStream.available() > 0) {
+			numberRead = dataInputStream.readInt();
+			if (isQueueFull(rank, priorityQueue) == false) {
+				priorityQueue.add(numberRead);
+			} else {
+				// This is the most important line in the entire file...
+				if (isNumberGreaterThanSmallestNumberInQueue( priorityQueue, numberRead ) ) {
+					priorityQueue.remove();
+					priorityQueue.add( numberRead );
 				}
 			}
-			else
-				break;
 		}
+
+		return priorityQueue.peek();
 	}
 
 	private boolean isNumberGreaterThanSmallestNumberInQueue( PriorityQueue<Integer> priorityQueue, int randomNumber ) {
