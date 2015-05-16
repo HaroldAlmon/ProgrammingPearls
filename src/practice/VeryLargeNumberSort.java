@@ -26,7 +26,7 @@ public enum VeryLargeNumberSort {
 			fileCreator.createFile( maxNum, fileName );
 		}
 
-		Sortor sortor = new Sortor();
+		FileSorter sortor = new FileSorter();
 		result = sortor.rankedNumber( fileName, maxNum, rank );
 		return result;
 	}
