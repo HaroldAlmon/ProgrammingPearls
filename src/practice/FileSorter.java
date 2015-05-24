@@ -33,7 +33,7 @@ public class FileSorter {
 		int numberRead;
 		PriorityQueue<Integer> priorityQueue = new PriorityQueue<>( 10_000 );
 		
-		while (dataInputStream.available() > 0) {
+		while ( dataInputStream.available() > 0 ) {
 			numberRead = dataInputStream.readInt();
 			if (isQueueFull(rank, priorityQueue) == false) {
 				priorityQueue.add(numberRead);
