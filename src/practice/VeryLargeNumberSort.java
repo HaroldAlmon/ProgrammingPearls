@@ -8,9 +8,6 @@ import java.nio.file.Paths;
 // NOTE: Because this is an enum, you cannot run a JUnit test from this file!
 public enum VeryLargeNumberSort {
 	INSTANCE;
-	//private final boolean isDebug = false;
-
-	//private static String fileName = "numbers.bin";
 	public static VeryLargeNumberSort getInstance() {
 		return INSTANCE;
 	}
